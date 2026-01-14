@@ -1,3 +1,9 @@
+.idea/
+
+# Freezing these to allow PyCharm dev while keeping online IDE unaffected for project
+requirements.txt
+runtime.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
