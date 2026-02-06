@@ -1,0 +1,33 @@
+networks:
+  temp-net:
+    external: true
+
+services:
+
+  db:
+    image: postgres:16-alpine
+    container_name: course5_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: devdb
+    ports:
+      - "5432:5432"
+    networks:
+      - temp-net
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    container_name: course5_adminer
+    profiles: ["tools"]
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - temp-net
+
+volumes:
+  db_data:
