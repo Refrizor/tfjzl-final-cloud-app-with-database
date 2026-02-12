@@ -8,7 +8,6 @@ except Exception:
     sys.exit()
 
 from django.conf import settings
-import uuid
 
 
 # Instructor model
@@ -69,6 +68,25 @@ class Course(models.Model):
             "Description: " + self.description
 
 
+# Enrollment model
+# <HINT> Once a user enrolled a class, an enrollment entry should be created between the user and course
+# And we could use the enrollment to track information such as exam submissions
+class Enrollment(models.Model):
+    AUDIT = 'audit'
+    HONOR = 'honor'
+    BETA = 'BETA'
+    COURSE_MODES = [
+        (AUDIT, 'Audit'),
+        (HONOR, 'Honor'),
+        (BETA, 'BETA')
+    ]
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    date_enrolled = models.DateField(default=now)
+    mode = models.CharField(max_length=5, choices=COURSE_MODES, default=AUDIT)
+    rating = models.FloatField(default=5.0)
+
+
 # Lesson model
 class Lesson(models.Model):
     title = models.CharField(max_length=200, default="title")
@@ -101,29 +119,10 @@ class Choice(models.Model):
     is_correct = models.BooleanField(default=False)
 
 
-# Enrollment model
-# <HINT> Once a user enrolled a class, an enrollment entry should be created between the user and course
-# And we could use the enrollment to track information such as exam submissions
-class Enrollment(models.Model):
-    AUDIT = 'audit'
-    HONOR = 'honor'
-    BETA = 'BETA'
-    COURSE_MODES = [
-        (AUDIT, 'Audit'),
-        (HONOR, 'Honor'),
-        (BETA, 'BETA')
-    ]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    date_enrolled = models.DateField(default=now)
-    mode = models.CharField(max_length=5, choices=COURSE_MODES, default=AUDIT)
-    rating = models.FloatField(default=5.0)
-
+class Submission(models.Model):
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
+    choices = models.ManyToManyField(Choice)
 
 # One enrollment could have multiple submission
 # One submission could have multiple choices
 # One choice could belong to multiple submissions
-
-class Submission(models.Model):
-    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
-    choices = models.ManyToManyField(Choice)
